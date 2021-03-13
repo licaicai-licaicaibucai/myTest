@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace属性: 接口类的全限定名-->
+<mapper namespace="com.li.dao.UserDao">
+    <!--
+        每一个子标签，就对应Dao接口中的一个方法
+            查询方法就对应select标签
+            添加方法就对应insert标签
+            删除方法就对应delete标签
+            修改方法就对应update标签
+
+        标签的id就对应方法的名字
+
+        标签的parameterType就对应方法的参数类型
+
+        标签的resultType(只有select标签才有)就对应方法的返回值类型，如果返回值类型是List，那么
+        resultType就是List的泛型类型
+    -->
+    <select id="findAll" resultType="com.li.pojo.User">
+        select * from t_user
+    </select>
+
+    <delete id="deleteById" parameterType="int">
+        DELETE FROM t_user WHERE uid=#{uid}
+    </delete>
+
+    <insert id="addUser" parameterType="com.li.pojo.User">
+         INSERT INTO t_user(username,sex,birthday,address) VALUES (#{username},#{sex},#{birthday},#{address})
+    </insert>
+
+    <!--parameterType属性: 参数的类型 ;  赋值的时候直接写对象里面的属性名-->
+    <insert id="addUserAndReturnId" parameterType="com.li.pojo.User">
+    <!--presultType: 主键类型; keyProperty:pojo里面对应的id的属性名; order属性: 指定是在目标的sql语句之前还是之后执行 -->
+    <selectKey resultType="int" keyProperty="uid" order="AFTER">
+        SELECT LAST_INSERT_ID()
+    </selectKey>
+    INSERT INTO t_user(username,sex,birthday,address)VALUES(#{username},#{sex},#{birthday},#{address})
+    </insert>
+
+    <select id="searchByUsername" parameterType="String" resultType="com.li.pojo.User">
+      <!-- SELECT * from t-user WHERE username LIKE "%"#{username}"%"-->
+        <!--select * from t_user where username like concat("%",#{username},"%")-->
+        select * from t_user where username like "%${username}%"
+    </select>
+
+    <select id="findByQueryBean" resultType="com.li.pojo.User" parameterType="com.li.pojo.QueryBean">
+        SELECT * FROM t_user WHERE  username LIKE  "%"#{user.username}"%"
+    </select>
+</mapper>
